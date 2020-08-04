@@ -21,7 +21,22 @@ using (var client = new TerminalClient())
     Console.WriteLine(result);
 }
 ```
+### Redirect Proccess Output
+To redirect the proccess output
 
+```csharp
+using (var client = new TerminalClient())
+{
+    client.OnOutput += OnOutput;
+    
+    await client.ExcuteAsync(@"C:\","ipconfig",null);
+}
+
+private void OnOutput(object sender,string e)
+{
+    Console.WriteLine(e);
+}
+```
 ### Trace Proccess
 
 ```csharp

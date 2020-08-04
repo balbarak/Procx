@@ -18,9 +18,12 @@ namespace Procx
         private readonly ConcurrentQueue<string> _outputData = new ConcurrentQueue<string>();
         private readonly ConcurrentQueue<string> _errorData = new ConcurrentQueue<string>();
         private readonly AsyncManualResetEvent _outputProcessEvent = new AsyncManualResetEvent();
-        private readonly TaskCompletionSource<bool> _processExitedCompletionSource = new TaskCompletionSource<bool>();
         private readonly TimeSpan _sigintTimeout = TimeSpan.FromMilliseconds(7500);
         private readonly TimeSpan _sigtermTimeout = TimeSpan.FromMilliseconds(2500);
+        private readonly Dictionary<string, string> _environmentVariables = new Dictionary<string, string>();
+
+        private  TaskCompletionSource<bool> _processExitedCompletionSource;
+
         private Encoding _outputEncoding = Encoding.UTF8;
         private bool _waitingOnStreams = false;
         private Stopwatch _stopWatch;
@@ -30,7 +33,6 @@ namespace Procx
         private readonly ITraceWriter _trace;
 
         public event EventHandler<string> OnOutput;
-        public event EventHandler<string> OnErrorOutput;
 
         public TerminalClient()
         {
@@ -45,6 +47,16 @@ namespace Procx
         public TerminalClient(ITraceWriter trace, Encoding encoding) : this(trace)
         {
             _outputEncoding = encoding;
+        }
+
+        public TerminalClient(ITraceWriter trace, Dictionary<string,string> environmentVariables) : this(trace)
+        {
+            _environmentVariables = environmentVariables;
+        }
+
+        public TerminalClient(ITraceWriter trace, Dictionary<string, string> environmentVariables,Encoding encoding) : this(trace,encoding)
+        {
+            _environmentVariables = environmentVariables;
         }
 
         public Task<int> ExcuteAsync(string workingDir, string fileName, string args, CancellationToken ctk = default)
@@ -118,6 +130,8 @@ namespace Procx
 
         private void InitProcess(string workingDir, string fileName, string args, bool killProccessOnCancel)
         {
+            _processExitedCompletionSource = new TaskCompletionSource<bool>();
+
             _trace?.Info("Starting process:");
             _trace?.Info($"  File name: '{fileName}'");
             _trace?.Info($"  Arguments: '{args}'");
@@ -138,6 +152,11 @@ namespace Procx
             {
                 _proc.StartInfo.StandardOutputEncoding = _outputEncoding;
                 _proc.StartInfo.StandardErrorEncoding = _outputEncoding;
+            }
+
+            foreach (var item in _environmentVariables)
+            {
+                _proc.StartInfo.EnvironmentVariables[item.Key] = item.Value;
             }
 
             _proc.EnableRaisingEvents = true;
@@ -245,9 +264,7 @@ namespace Procx
                     if (item == null)
                         continue;
 
-                    _trace.Info(item);
-
-                    OnErrorOutput?.Invoke(this, item);
+                    OnOutput?.Invoke(this, item);
                 }
             }
 
@@ -257,8 +274,6 @@ namespace Procx
                 {
                     if (item == null)
                         continue;
-
-                    _trace.Info(item);
 
                     OnOutput?.Invoke(this,item);
 

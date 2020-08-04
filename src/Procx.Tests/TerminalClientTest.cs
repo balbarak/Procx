@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -48,7 +50,42 @@ namespace Procx.Tests
         {
             using (var client = new TerminalClient(_trace))
             {
-                var re = await client.ExcuteAndReadOutputAsync(@"C:\", "cmd.exe", "/c dir");
+                var result = await client.ExcuteAndReadOutputAsync(@"C:\", "cmd.exe", "/c dir");
+
+                Assert.NotNull(result);
+            }
+        }
+
+        [Fact]
+        public async Task Should_Excute_When_No_Args()
+        {
+            using (var client = new TerminalClient())
+            {
+                var result = await client.ExcuteAndReadOutputAsync(@"C:\", "cmd.exe", "/c dir");
+
+                Assert.NotNull(result);
+            }
+        }
+
+        [Fact]
+        public async Task Should_Set_Env_Variable()
+        {
+            var value = "Yeah it is work";
+
+            var env = new Dictionary<string, string>()
+            {
+                ["TestVar"] = value
+            };
+
+            using (var client = new TerminalClient(_trace, env))
+            {
+                var result = await client.ExcuteAndReadOutputAsync(@"C:\", "powershell.exe", "/c echo $Env:TestVar");
+
+                result = result
+                    .Replace("\n", "")
+                    .Replace("\r", "");
+
+                Assert.Equal(value, result);
             }
         }
     }

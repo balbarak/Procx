@@ -29,6 +29,9 @@ namespace Procx
         private StreamWriter _inputWriter;
         private readonly ITraceWriter _trace;
 
+        public event EventHandler<string> OnOutput;
+        public event EventHandler<string> OnErrorOutput;
+
         public TerminalClient()
         {
 
@@ -39,14 +42,14 @@ namespace Procx
             _trace = trace;
         }
 
-        public TerminalClient(ITraceWriter trace,Encoding encoding) : this(trace)
+        public TerminalClient(ITraceWriter trace, Encoding encoding) : this(trace)
         {
             _outputEncoding = encoding;
         }
 
-        public Task<int> ExcuteAsync(string workingDir,string fileName,string args,CancellationToken ctk = default)
+        public Task<int> ExcuteAsync(string workingDir, string fileName, string args, CancellationToken ctk = default)
         {
-            return ExcuteInternalAsync(workingDir,fileName,args,cancellationToken:ctk);
+            return ExcuteInternalAsync(workingDir, fileName, args, cancellationToken: ctk);
         }
 
         private async Task<int> ExcuteInternalAsync(
@@ -104,8 +107,11 @@ namespace Procx
 
                 ProcessOutput();
 
+
                 _trace?.Info($"Finished process {_proc.Id} with exit code {_proc.ExitCode}, and elapsed time {_stopWatch.Elapsed}.");
             }
+
+            await Task.Delay(50);
 
             return _proc.ExitCode;
         }
@@ -236,7 +242,12 @@ namespace Procx
             {
                 foreach (var item in errorData)
                 {
+                    if (item == null)
+                        continue;
 
+                    _trace.Info(item);
+
+                    OnErrorOutput?.Invoke(this, item);
                 }
             }
 
@@ -244,6 +255,12 @@ namespace Procx
             {
                 foreach (var item in outputData)
                 {
+                    if (item == null)
+                        continue;
+
+                    _trace.Info(item);
+
+                    OnOutput?.Invoke(this,item);
 
                 }
             }

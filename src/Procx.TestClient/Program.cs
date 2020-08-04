@@ -14,14 +14,11 @@ namespace Procx.TestClient
            
             using (var client = new TerminalClient())
             {
+                var workingDir = @"C:\";
+                var fileName = "cmd.exe";
+                var cmd = "/c dir";
 
-                client.OnOutput += OnOutput;
-
-                await client.ExcuteAsync(@"C:\", "cmd.exe", "/c git --version");
-
-                await client.ExcuteAsync(@"C:\Repos", "cmd.exe", "/c dir");
-
-
+                var result = await client.ExcuteAndReadOutputAsync(workingDir, fileName, cmd);
             }
         }
 

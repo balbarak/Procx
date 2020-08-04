@@ -19,7 +19,6 @@ namespace Procx.Tests
             }
         }
 
-
         [Fact]
         public async Task Should_Excute_Multiple_Command()
         {
@@ -41,6 +40,15 @@ namespace Procx.Tests
                 var exitCode = await client.ExcuteAsync(@"C:\", "cmd.exe", null);
 
                 Assert.Equal(0, exitCode);
+            }
+        }
+
+        [Fact]
+        public async Task Should_Excute_Cmd_And_Wait_Result()
+        {
+            using (var client = new TerminalClient(_trace))
+            {
+                var re = await client.ExcuteAndReadOutputAsync(@"C:\", "cmd.exe", "/c dir");
             }
         }
     }

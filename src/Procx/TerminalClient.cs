@@ -21,8 +21,8 @@ namespace Procx
         private readonly TimeSpan _sigintTimeout = TimeSpan.FromMilliseconds(7500);
         private readonly TimeSpan _sigtermTimeout = TimeSpan.FromMilliseconds(2500);
         private readonly Dictionary<string, string> _environmentVariables = new Dictionary<string, string>();
-
-        private  TaskCompletionSource<bool> _processExitedCompletionSource;
+        private readonly StringBuilder _output = new StringBuilder();
+        private TaskCompletionSource<bool> _processExitedCompletionSource;
 
         private Encoding _outputEncoding = Encoding.UTF8;
         private bool _waitingOnStreams = false;
@@ -49,12 +49,12 @@ namespace Procx
             _outputEncoding = encoding;
         }
 
-        public TerminalClient(ITraceWriter trace, Dictionary<string,string> environmentVariables) : this(trace)
+        public TerminalClient(ITraceWriter trace, Dictionary<string, string> environmentVariables) : this(trace)
         {
             _environmentVariables = environmentVariables;
         }
 
-        public TerminalClient(ITraceWriter trace, Dictionary<string, string> environmentVariables,Encoding encoding) : this(trace,encoding)
+        public TerminalClient(ITraceWriter trace, Dictionary<string, string> environmentVariables, Encoding encoding) : this(trace, encoding)
         {
             _environmentVariables = environmentVariables;
         }
@@ -64,12 +64,28 @@ namespace Procx
             return ExcuteInternalAsync(workingDir, fileName, args, cancellationToken: ctk);
         }
 
+        public async Task<string> ExcuteAndReadOutputAsync(string workingDir, string fileName, string args, CancellationToken ctk = default)
+        {
+            _output.Clear();
+
+            var exitCode = await ExcuteInternalAsync(
+                workingDir,
+                fileName,
+                args,
+                saveOutput: true,
+                cancellationToken: ctk);
+
+            return _output.ToString();
+        }
+
+
         private async Task<int> ExcuteInternalAsync(
             string workingDir,
             string fileName,
             string args,
             ConcurrentQueue<string> inputs = null,
             bool killProcessOnCancel = true,
+            bool saveOutput = false,
             CancellationToken cancellationToken = default)
         {
             InitProcess(workingDir, fileName, args, killProcessOnCancel);
@@ -108,7 +124,7 @@ namespace Procx
 
                     if (signaled == outputSignal)
                     {
-                        ProcessOutput();
+                        ProcessOutput(saveOutput);
                     }
                     else
                     {
@@ -117,13 +133,10 @@ namespace Procx
                     }
                 }
 
-                ProcessOutput();
-
+                ProcessOutput(saveOutput);
 
                 _trace?.Info($"Finished process {_proc.Id} with exit code {_proc.ExitCode}, and elapsed time {_stopWatch.Elapsed}.");
             }
-
-            await Task.Delay(50);
 
             return _proc.ExitCode;
         }
@@ -236,7 +249,7 @@ namespace Procx
             });
         }
 
-        private void ProcessOutput()
+        private void ProcessOutput(bool saveOutput = false)
         {
             List<string> errorData = new List<string>();
             List<string> outputData = new List<string>();
@@ -265,6 +278,9 @@ namespace Procx
                         continue;
 
                     OnOutput?.Invoke(this, item);
+
+                    if (saveOutput)
+                        _output.AppendLine(item);
                 }
             }
 
@@ -275,7 +291,10 @@ namespace Procx
                     if (item == null)
                         continue;
 
-                    OnOutput?.Invoke(this,item);
+                    OnOutput?.Invoke(this, item);
+
+                    if (saveOutput)
+                        _output.AppendLine(item);
 
                 }
             }

@@ -21,3 +21,23 @@ using (var client = new TerminalClient())
     Console.WriteLine(result);
 }
 ```
+
+### Trace Proccess
+
+```csharp
+public class TraceWriter : ITraceWriter
+{
+    public void Info(string output)
+    {
+        Console.WriteLine(output);
+    }
+}
+
+private TraceWriter _trace = new TraceWriter();
+
+using (var client = new TerminalClient(_trace))
+{
+    await client.ExcuteAsync(@"C:\","cmd.exe","/c dir");
+}
+
+```

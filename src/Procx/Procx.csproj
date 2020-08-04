@@ -2,6 +2,10 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Authors>balbarak</Authors>
+    <Company>balbarak</Company>
+    <PackageProjectUrl>https://github.com/balbarak/Procx</PackageProjectUrl>
   </PropertyGroup>
 
 </Project>

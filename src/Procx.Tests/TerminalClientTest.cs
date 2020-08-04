@@ -88,5 +88,16 @@ namespace Procx.Tests
                 Assert.Equal(value, result);
             }
         }
+
+        [Fact]
+        public async Task Should_Excute_When_No_Cmd()
+        {
+            using (var client = new TerminalClient())
+            {
+                var result = await client.ExcuteAndReadOutputAsync(@"C:\", "ipconfig", "/all");
+
+                Assert.NotNull(result);
+            }
+        }
     }
 }

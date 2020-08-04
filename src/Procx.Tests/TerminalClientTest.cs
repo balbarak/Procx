@@ -96,6 +96,7 @@ namespace Procx.Tests
             {
                 var result = await client.ExcuteAndReadOutputAsync(@"C:\", "ipconfig", "/all");
 
+              
                 Assert.NotNull(result);
             }
         }

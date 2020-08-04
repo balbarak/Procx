@@ -19,10 +19,8 @@ namespace Procx
         private readonly ConcurrentQueue<string> _errorData = new ConcurrentQueue<string>();
         private readonly AsyncManualResetEvent _outputProcessEvent = new AsyncManualResetEvent();
         private readonly TaskCompletionSource<bool> _processExitedCompletionSource = new TaskCompletionSource<bool>();
-
         private readonly TimeSpan _sigintTimeout = TimeSpan.FromMilliseconds(7500);
         private readonly TimeSpan _sigtermTimeout = TimeSpan.FromMilliseconds(2500);
-
         private Encoding _outputEncoding = Encoding.UTF8;
         private bool _waitingOnStreams = false;
         private Stopwatch _stopWatch;
@@ -44,6 +42,68 @@ namespace Procx
         public ProcxClient(ITraceWriter trace,Encoding encoding) : this(trace)
         {
             _outputEncoding = encoding;
+        }
+
+
+        public async Task<int> ExcuteAsync(
+            string workingDir,
+            string fileName,
+            string args,
+            ConcurrentQueue<string> inputs = null,
+            bool killProcessOnCancel = true,
+            CancellationToken cancellationToken = default)
+        {
+            InitProcess(workingDir, fileName, args, killProcessOnCancel);
+
+            // Ensure we process STDOUT even the process exit event happen before we start read STDOUT stream.
+            Interlocked.Increment(ref _streamReadCount);
+            Interlocked.Increment(ref _streamReadCount);
+
+            _stopWatch = Stopwatch.StartNew();
+
+            _proc.Start();
+
+            var readErrorTask = ReadStream(_proc.StandardError, _errorData);
+
+            var readOutputTask = ReadStream(_proc.StandardOutput, _outputData);
+
+            if (inputs != null)
+            {
+                var task = WriteStream(inputs, _proc.StandardInput, true);
+            }
+            else
+            {
+                // Close the input stream. This is done to prevent commands from blocking the build waiting for input from the user.
+                _proc.StandardInput.Close();
+            }
+
+            using (var registration = cancellationToken.Register(async () => await CancelAndKillProcessTree(killProcessOnCancel)))
+            {
+                _trace?.Info($"Process started with process id {_proc.Id}, waiting for process exit.");
+
+                while (true)
+                {
+                    Task outputSignal = _outputProcessEvent.WaitAsync();
+
+                    var signaled = await Task.WhenAny(outputSignal, _processExitedCompletionSource.Task);
+
+                    if (signaled == outputSignal)
+                    {
+                        ProcessOutput();
+                    }
+                    else
+                    {
+                        _stopWatch.Stop();
+                        break;
+                    }
+                }
+
+                ProcessOutput();
+
+                _trace?.Info($"Finished process {_proc.Id} with exit code {_proc.ExitCode}, and elapsed time {_stopWatch.Elapsed}.");
+            }
+
+            return _proc.ExitCode;
         }
 
         private void InitProcess(string workingDir, string fileName, string args, bool killProccessOnCancel)

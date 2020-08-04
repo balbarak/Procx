@@ -41,3 +41,10 @@ using (var client = new TerminalClient(_trace))
 }
 
 ```
+
+## Acknowledgements
+
+This project was built from great work done by
+
+* [Azure piplines agent](https://github.com/microsoft/azure-pipelines-agent)
+

@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30320.27
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Procx", "Procx\Procx.csproj", "{D8699E47-5ACB-41C1-9236-3B2443466A66}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D8699E47-5ACB-41C1-9236-3B2443466A66}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D8699E47-5ACB-41C1-9236-3B2443466A66}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D8699E47-5ACB-41C1-9236-3B2443466A66}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D8699E47-5ACB-41C1-9236-3B2443466A66}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {F043FDBE-F4AE-40F2-9126-C39374AA6DED}
+	EndGlobalSection
+EndGlobal

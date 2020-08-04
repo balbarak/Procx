@@ -1,5 +1,5 @@
 ## Introduction
-Procx is .NET Standard library that simplifiy working with a proccess, cmd and terminal. 
+Procx is a Cross-Platform library that simplifiy working with a proccess, cmd and terminal. 
 
 ## Getting Started
 

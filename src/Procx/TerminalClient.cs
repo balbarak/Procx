@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace Procx
 {
-    public partial class ProcxClient : IDisposable
+    public partial class TerminalClient : IDisposable
     {
         private delegate bool ConsoleCtrlDelegate(ConsoleCtrlEvent CtrlType);
 
@@ -29,23 +29,27 @@ namespace Procx
         private StreamWriter _inputWriter;
         private readonly ITraceWriter _trace;
 
-        public ProcxClient()
+        public TerminalClient()
         {
 
         }
 
-        public ProcxClient(ITraceWriter trace)
+        public TerminalClient(ITraceWriter trace)
         {
             _trace = trace;
         }
 
-        public ProcxClient(ITraceWriter trace,Encoding encoding) : this(trace)
+        public TerminalClient(ITraceWriter trace,Encoding encoding) : this(trace)
         {
             _outputEncoding = encoding;
         }
 
+        public Task<int> ExcuteAsync(string workingDir,string fileName,string args,CancellationToken ctk = default)
+        {
+            return ExcuteInternalAsync(workingDir,fileName,args,cancellationToken:ctk);
+        }
 
-        public async Task<int> ExcuteAsync(
+        private async Task<int> ExcuteInternalAsync(
             string workingDir,
             string fileName,
             string args,

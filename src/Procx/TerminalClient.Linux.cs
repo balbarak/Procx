@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Procx
 {
-    public partial class ProcxClient
+    public partial class TerminalClient
     {
         [DllImport("libc", SetLastError = true)]
         private static extern int kill(int pid, int sig);

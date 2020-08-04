@@ -3,7 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30320.27
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Procx", "Procx\Procx.csproj", "{D8699E47-5ACB-41C1-9236-3B2443466A66}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Procx", "Procx\Procx.csproj", "{D8699E47-5ACB-41C1-9236-3B2443466A66}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{199C8612-347F-4BF4-998E-7CA7BB7D13B0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Procx.Tests", "Procx.Tests\Procx.Tests.csproj", "{8421FA90-3C70-4A4B-BE09-EFBC400B9367}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,9 +19,16 @@ Global
 		{D8699E47-5ACB-41C1-9236-3B2443466A66}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D8699E47-5ACB-41C1-9236-3B2443466A66}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D8699E47-5ACB-41C1-9236-3B2443466A66}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8421FA90-3C70-4A4B-BE09-EFBC400B9367}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8421FA90-3C70-4A4B-BE09-EFBC400B9367}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8421FA90-3C70-4A4B-BE09-EFBC400B9367}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8421FA90-3C70-4A4B-BE09-EFBC400B9367}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{8421FA90-3C70-4A4B-BE09-EFBC400B9367} = {199C8612-347F-4BF4-998E-7CA7BB7D13B0}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {F043FDBE-F4AE-40F2-9126-C39374AA6DED}

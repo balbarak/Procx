@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Procx
 {
-    public partial class ProcxClient
+    public partial class TerminalClient
     {
 
         [DllImport("kernel32.dll", SetLastError = true)]

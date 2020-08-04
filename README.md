@@ -3,6 +3,10 @@ Procx is .NET Standard library that simplifiy working with a proccess, cmd and t
 
 ## Getting Started
 
+From Nuget
+
+`Install-Package Procx -Version 1.0.0`
+
 To excute a command line from your C# App
 
 ```csharp

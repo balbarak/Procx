@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Net.NetworkInformation;
-using System.Reflection.Metadata;
 using System.Threading.Tasks;
 
-namespace Procx.TestClient
+namespace Procx.Windows.Client
 {
     class Program
     {
@@ -11,28 +9,22 @@ namespace Procx.TestClient
 
         static async Task Main(string[] args)
         {
-           
-            using (var client = new TerminalClient())
+            using (var client = new TerminalClient(_trace))
             {
                 var workingDir = @"C:\";
                 var fileName = "cmd.exe";
                 var cmd = "/c dir";
 
-                var result = await client.ExcuteAndReadOutputAsync(workingDir, fileName, cmd);
+                client.OnOutput += OnOutput;
+
+                await client.ExcuteAsync(workingDir, fileName, cmd);
+
             }
         }
 
         private static void OnOutput(object sender, string e)
         {
             Console.WriteLine(e);
-        }
-    }
-
-    public class TraceWriter : ITraceWriter
-    {
-        public void Info(string output)
-        {
-            Console.WriteLine(output);
         }
     }
 }
